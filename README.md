@@ -2,7 +2,7 @@ Blender 3MF Format with MMU support
 ====
 This is a Blender add-on that allows importing and exporting 3MF files.
 
-This fork contains an modified version of the original Blender3mfFormat plugin that adds support for exporting face coloring via extruder IDs which can then be imported into PrusaSlicer and similar slicers. To use this feature create materials with names ending in ".e<num>", e.g. "Brown.e3", then assign them to faces. The number in the suffix defines the extruder number to use during slicing. In the exporter dialog enable "Use Extruder Numbers".
+This fork contains a modified version of the original Blender3mfFormat plugin that adds support for exporting face coloring via extruder IDs which can then be imported into PrusaSlicer and similar slicers. To use this feature create materials with names ending in ".e<num>", e.g. "Brown.e3", then assign them to faces. The number in the suffix defines the extruder number to use during slicing. In the exporter dialog enable "Use Extruder Numbers".
 
 
 Original documentation follows:

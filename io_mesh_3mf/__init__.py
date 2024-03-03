@@ -11,12 +11,12 @@
 # <pep8 compliant>
 
 bl_info = {
-    "name": "3MF format",
-    "author": "Ghostkeeper",
+    "name": "3MF-MMU",
+    "author": "Ghostkeeper, hkruse68",
     "version": (1, 0, 2),
-    "blender": (2, 80, 0),
+    "blender": (3, 6, 0),
     "location": "File > Import-Export",
-    "description": "Import-Export 3MF files",
+    "description": "Import-Export 3MF files with MMU support",
     "category": "Import-Export"
 }
 
@@ -43,14 +43,14 @@ def menu_import(self, _):
     """
     Calls the 3MF import operator from the menu item.
     """
-    self.layout.operator(Import3MF.bl_idname, text="3D Manufacturing Format (.3mf)")
+    self.layout.operator(Import3MF.bl_idname, text="3MF with MMU support (.3mf)")
 
 
 def menu_export(self, _):
     """
     Calls the 3MF export operator from the menu item.
     """
-    self.layout.operator(Export3MF.bl_idname, text="3D Manufacturing Format (.3mf)")
+    self.layout.operator(Export3MF.bl_idname, text="3MF with MMU support (.3mf)")
 
 
 classes = (

@@ -22,6 +22,7 @@ import logging  # To debug and log progress.
 import mathutils  # For the transformation matrices.
 import xml.etree.ElementTree  # To write XML documents with the 3D model data.
 import zipfile  # To write zip archives, the shell of the 3MF file.
+import re
 
 from .annotations import Annotations  # To store file annotations
 from .constants import *
@@ -49,6 +50,10 @@ class Export3MF(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     use_selection: bpy.props.BoolProperty(
         name="Selection Only",
         description="Export selected objects only.",
+        default=False)
+    use_extruder_numbers: bpy.props.BoolProperty(
+        name="Use Extruder numbers",
+        description="Export face colors via extruder numbers",
         default=False)
     global_scale: bpy.props.FloatProperty(
         name="Scale",
@@ -102,6 +107,9 @@ class Export3MF(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
 
         global_scale = self.unit_scale(context)
 
+        if self.use_extruder_numbers:
+            xml.etree.ElementTree.register_namespace(SLIC3RPE_NS_PREFIX, SLIC3RPE_NAMESPACE)
+        
         # Due to an open bug in Python 3.7 (Blender's version) we need to prefix all elements with the namespace.
         # Bug: https://bugs.python.org/issue17088
         # Workaround: https://stackoverflow.com/questions/4997848/4999510#4999510
@@ -110,6 +118,13 @@ class Export3MF(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         scene_metadata = Metadata()
         scene_metadata.retrieve(bpy.context.scene)
         self.write_metadata(root, scene_metadata)
+        if self.use_extruder_numbers:
+            metadata_node = xml.etree.ElementTree.SubElement(root, f"{{{MODEL_NAMESPACE}}}metadata")
+            metadata_node.attrib[f"{{{MODEL_NAMESPACE}}}name"] = f"{SLIC3RPE_NS_PREFIX}:Version3mf"
+            metadata_node.text = "1"
+            metadata_node = xml.etree.ElementTree.SubElement(root, f"{{{MODEL_NAMESPACE}}}metadata")
+            metadata_node.attrib[f"{{{MODEL_NAMESPACE}}}name"] = f"{SLIC3RPE_NS_PREFIX}:MmPaintingVersion"
+            metadata_node.text = "1"
 
         resources_element = xml.etree.ElementTree.SubElement(root, f"{{{MODEL_NAMESPACE}}}resources")
         self.material_name_to_index = self.write_materials(resources_element, blender_objects)
@@ -438,6 +453,7 @@ class Export3MF(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                 metadata_node.attrib[f"{{{MODEL_NAMESPACE}}}type"] = metadata_entry.datatype
             metadata_node.text = metadata_entry.value
 
+       
     def format_transformation(self, transformation):
         """
         Formats a transformation matrix in 3MF's formatting.
@@ -496,6 +512,9 @@ class Export3MF(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         v2_name = f"{{{MODEL_NAMESPACE}}}v2"
         v3_name = f"{{{MODEL_NAMESPACE}}}v3"
         p1_name = f"{{{MODEL_NAMESPACE}}}p1"
+        if self.use_extruder_numbers:
+            e_name = f"{{{SLIC3RPE_NAMESPACE}}}mmu_segmentation"
+            e_regexp = re.compile("[^\.]*\.e(\d+)")
 
         for triangle in triangles:
             triangle_element = xml.etree.ElementTree.SubElement(triangles_element, triangle_name)
@@ -509,6 +528,14 @@ class Export3MF(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                 if material_index != object_material_list_index:
                     # Not equal to the index that our parent object was written with, so we must override it here.
                     triangle_element.attrib[p1_name] = str(material_index)
+                if self.use_extruder_numbers:
+                    e_match = e_regexp.fullmatch(material_slots[triangle.material_index].material.name)
+                    if e_match:
+                        e_num = int(e_match.group(1))
+                        if e_num > 0 and e_num <= 2:
+                            triangle_element.attrib[e_name] = str(e_num * 4)
+                        elif e_num >=3 and e_num <= 16:
+                            triangle_element.attrib[e_name] = str(e_num - 3) + "C"
 
     def format_number(self, number, decimals):
         """

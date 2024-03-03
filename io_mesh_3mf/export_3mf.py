@@ -82,6 +82,7 @@ class Export3MF(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         self.num_written = 0  # How many objects we've written to the file.
         self.material_resource_id = -1  # We write one material. This is the resource ID of that material.
         self.material_name_to_index = {}  # For each material in Blender, the index in the 3MF materials group.
+        self.material_to_extruder = {}
 
     def execute(self, context):
         """
@@ -524,18 +525,24 @@ class Export3MF(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
 
             if triangle.material_index < len(material_slots):
                 # Convert to index in our global list.
-                material_index = self.material_name_to_index[material_slots[triangle.material_index].material.name]
+                mat_name = material_slots[triangle.material_index].material.name
+                material_index = self.material_name_to_index[mat_name]
                 if material_index != object_material_list_index:
                     # Not equal to the index that our parent object was written with, so we must override it here.
                     triangle_element.attrib[p1_name] = str(material_index)
                 if self.use_extruder_numbers:
-                    e_match = e_regexp.fullmatch(material_slots[triangle.material_index].material.name)
-                    if e_match:
-                        e_num = int(e_match.group(1))
-                        if e_num > 0 and e_num <= 2:
-                            triangle_element.attrib[e_name] = str(e_num * 4)
-                        elif e_num >=3 and e_num <= 16:
-                            triangle_element.attrib[e_name] = str(e_num - 3) + "C"
+                    e_num = self.material_to_extruder.get(material_index)
+                    if not e_num:
+                        e_match = e_regexp.fullmatch(mat_name)
+                        if e_match:
+                            e_num = int(e_match.group(1))
+                        else:
+                            e_num = 0
+                        self.material_to_extruder[material_index] = e_num
+                    if e_num > 0 and e_num <= 2:
+                        triangle_element.attrib[e_name] = str(e_num * 4)
+                    elif e_num >=3 and e_num <= 16:
+                        triangle_element.attrib[e_name] = str(e_num - 3) + "C"
 
     def format_number(self, number, decimals):
         """

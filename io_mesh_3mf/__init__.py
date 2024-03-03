@@ -13,7 +13,7 @@
 bl_info = {
     "name": "3MF-MMU",
     "author": "Ghostkeeper, hkruse68",
-    "version": (1, 0, 2, 1),
+    "version": (1, 0, 2, 2),
     "blender": (3, 6, 0),
     "location": "File > Import-Export",
     "description": "Import-Export 3MF files with MMU support",

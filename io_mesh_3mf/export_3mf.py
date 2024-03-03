@@ -514,7 +514,7 @@ class Export3MF(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         p1_name = f"{{{MODEL_NAMESPACE}}}p1"
         if self.use_extruder_numbers:
             e_name = f"{{{SLIC3RPE_NAMESPACE}}}mmu_segmentation"
-            e_regexp = re.compile("[^\.]*\.e(\d+)")
+            e_regexp = re.compile(".*\.e(\d+)")
 
         for triangle in triangles:
             triangle_element = xml.etree.ElementTree.SubElement(triangles_element, triangle_name)

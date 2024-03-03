@@ -36,8 +36,11 @@ MODEL_MIMETYPE = "application/vnd.ms-package.3dmanufacturing-3dmodel+xml"  # MIM
 
 # Constants in the 3D model file.
 MODEL_NAMESPACE = "http://schemas.microsoft.com/3dmanufacturing/core/2015/02"
+SLIC3RPE_NAMESPACE = "http://schemas.slic3r.org/3mf/2017/06"
+SLIC3RPE_NS_PREFIX = "slic3rpe"
 MODEL_NAMESPACES = {
-    "3mf": MODEL_NAMESPACE
+    "3mf": MODEL_NAMESPACE,
+    SLIC3RPE_NS_PREFIX: SLIC3RPE_NAMESPACE
 }
 MODEL_DEFAULT_UNIT = "millimeter"  # If the unit is missing, it will be this.
 

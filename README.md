@@ -1,6 +1,12 @@
-Blender 3MF Format
+Blender 3MF Format with MMU support
 ====
 This is a Blender add-on that allows importing and exporting 3MF files.
+
+This fork contains an modified version of the original Blender3mfFormat plugin that adds support for exporting face coloring via extruder IDs which can then be imported into PrusaSlicer and similar slicers. To use this feature create materials with names ending in ".e<num>", e.g. "Brown.e3", then assign them to faces. The number in the suffix defines the extruder number to use during slicing. In the exporter dialog enable "Use Extruder Numbers".
+
+
+Original documentation follows:
+
 
 3D Manufacturing Format files (.3mf) are a file format for triangular meshes intended to serve as exchange format for 3D printing applications. They can communicate not only the model, but also the intent and material of a 3D printing job from the CAD software to the CAM software (slicer). In this scenario, Blender serves as the CAD software. To that end, the aim of this add-on is to make Blender a more viable alternative as CAD software for additive manufacturing.
 

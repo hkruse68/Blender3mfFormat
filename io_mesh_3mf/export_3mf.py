@@ -542,7 +542,7 @@ class Export3MF(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                     if e_num > 0 and e_num <= 2:
                         triangle_element.attrib[e_name] = str(e_num * 4)
                     elif e_num >=3 and e_num <= 16:
-                        triangle_element.attrib[e_name] = str(e_num - 3) + "C"
+                        triangle_element.attrib[e_name] = '{:X}'.format(e_num - 3) + "C"
 
     def format_number(self, number, decimals):
         """
